@@ -14,7 +14,7 @@ app.secret_key = 'change-this-secret-key-in-production-ge-report-2026'
 
 # Simple admin user (change password!)
 ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD_HASH = generate_password_hash('admin123')  # Change this!
+ADMIN_PASSWORD_HASH = 'scrypt:32768:8:1$7vlOZW4u4AiKuvmA$b2b68ff177a3cd69357539f11b4c7c18694d4929f97ebf2a31f069b4e5234ee9f95035d0bc86cc137825f4f05f96360e3626d84a9676a88bf46a6bfc3862b8ba'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
