@@ -2,3 +2,4 @@ flask
 flask-login
 openpyxl
 werkzeug
+gunicorn
