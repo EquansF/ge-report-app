@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport #{{ report.id }}</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #000; color: #f0f0f0; margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; background: #121212; padding: 30px; border-radius: 12px; }
+        h1 { color: #70bd95; }
+        a { color: #70bd95; }
+        .meta { background: #1e1e1e; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th { background: #1e1e1e; color: #70bd95; }
+        .photos img { max-width: 300px; margin: 10px; border-radius: 6px; }
+        .btn { background: #70bd95; color: #0f1419; padding: 8px 14px; border-radius: 5px; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('admin') }}" class="btn">← Retour à la liste</a>
+        <h1>Rapport #{{ report.id }}</h1>
+        <div class="meta">
+            <strong>Soumis le :</strong> {{ report.submitted_at[:19] }}<br>
+            <strong>Bâtiment :</strong> {{ report.batiment or '-' }}<br>
+            <strong>Rédacteur :</strong> {{ report.redacteur or '-' }}<br>
+            <strong>Date essai :</strong> {{ report.date_essai or '-' }}
+        </div>
+        
+        <h2>Données du formulaire</h2>
+        <table>
+            <tr><th>Champ</th><th>Valeur</th></tr>
+            {% for key, value in data.items() %}
+            <tr>
+                <td>{{ key }}</td>
+                <td>{{ value if value is not none else '-' }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+        {% if report.photo1 or report.photo2 %}
+        <h2>Photos</h2>
+        <div class="photos">
+            {% if report.photo1 %}
+            <div><img src="/uploads/{{ report.photo1 }}" alt="Photo 1"></div>
+            {% endif %}
+            {% if report.photo2 %}
+            <div><img src="/uploads/{{ report.photo2 }}" alt="Photo 2"></div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

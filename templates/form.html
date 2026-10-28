@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compte Rendu des Essais GE</title>
+    <style>
+        :root {
+            --bg: #000000;
+            --surface: #121212;
+            --surface-2: #1e1e1e;
+            --primary: #70bd95;
+            --primary-dark: #5aa87d;
+            --text: #f0f0f0;
+            --text-muted: #aaaaaa;
+            --border: #333333;
+            --accent: #70bd95;
+            --input-bg: #0a0a0a;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            border: 1px solid var(--border);
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+        header h1 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.6rem;
+            letter-spacing: 0.5px;
+        }
+        header .meta {
+            text-align: right;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+        h2 {
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+            padding-left: 12px;
+            margin-top: 32px;
+            font-size: 1.25rem;
+        }
+        h3 {
+            color: #8fd4b0;
+            margin-top: 20px;
+            font-size: 1.05rem;
+        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: #c5d0de;
+        }
+        input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea, select {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.95rem;
+            background: var(--input-bg);
+            color: var(--text);
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #1c2a3a;
+        }
+        input[readonly] {
+            background: #1e2836 !important;
+            color: var(--primary) !important;
+            font-weight: 600;
+        }
+        textarea { min-height: 80px; resize: vertical; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.9rem;
+        }
+        th, td {
+            border: 1px solid var(--border);
+            padding: 8px 10px;
+            text-align: center;
+        }
+        th {
+            background: var(--surface-2);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        td input {
+            border: none;
+            background: transparent;
+            text-align: center;
+            width: 100%;
+            padding: 4px;
+            color: var(--text);
+        }
+        td input:focus { background: #1c2a3a; }
+        .section-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        button {
+            background: var(--primary);
+            color: #0f1419;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        button:hover { background: var(--primary-dark); }
+        .note { font-size: 0.85rem; color: var(--text-muted); margin-top: 8px; }
+        #status { margin-top: 15px; padding: 10px; border-radius: 5px; display: none; }
+        .success { background: #1a3a2a; color: #70bd95; }
+        .error { background: #3a1a1a; color: #ff6b6b; }
+        @media (max-width: 800px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            header { flex-direction: column; align-items: flex-start; }
+            .container { margin: 8px; padding: 14px; }
+            .actions { flex-direction: column; }
+            .actions button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div>
+            <h1>COMPTE RENDU DES ESSAIS GE</h1>
+            <div style="margin-top:8px;">
+                <label>Bâtiment</label>
+                <select id="batiment">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="DC01">DC01</option>
+                    <option value="DC02">DC02</option>
+                    <option value="DC03">DC03</option>
+                    <option value="DC09">DC09</option>
+                    <option value="DC10">DC10</option>
+                    <option value="DC12">DC12</option>
+                </select>
+            </div>
+        </div>
+        <div class="meta">
+            <div style="margin:6px 0;">
+                <label>Rédacteurs</label>
+                <select id="redacteur">
+                    <option value="">-- Sélectionner --</option>
+                    <option value="Alexandre LHELGOUALCH">Alexandre LHELGOUALCH</option>
+                    <option value="Jeremy DAVRU">Jeremy DAVRU</option>
+                    <option value="Jonathan MILLE">Jonathan MILLE</option>
+                    <option value="Nicolas FABRE">Nicolas FABRE</option>
+                    <option value="Florian DESBORDES">Florian DESBORDES</option>
+                    <option value="Younouss INAJJAREN">Younouss INAJJAREN</option>
+                </select>
+            </div>
+            <div style="margin-top:8px;">
+                Date : <input type="date" id="dateEssai">
+            </div>
+        </div>
+    </header>
+
+    <h2>Groupes électrogènes concernés</h2>
+    <div class="section-box" style="display:flex; gap:20px; flex-wrap:wrap; align-items:center;">
+        <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" id="sel_gea" checked onchange="toggleGE()"> GE A
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" id="sel_geb" onchange="toggleGE()"> GE B
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" id="sel_gec" onchange="toggleGE()"> GE C
+        </label>
+        <label style="display:flex; align-items:center; gap:6px; font-weight:normal; cursor:pointer;">
+            <input type="checkbox" id="sel_ged" onchange="toggleGE()"> GE D
+        </label>
+    </div>
+
+    <div class="section-box">
+        <label>Consommation totale lors des essais (litres) — automatique</label>
+        <input type="number" id="consoTotale" readonly>
+    </div>
+
+    <h2>Problème(s) connu(s)</h2>
+    <textarea id="problemes" placeholder="Décrire les problèmes connus..."></textarea>
+
+    <h2>DÉBUT DES OPÉRATIONS</h2>
+
+    <h3>Relevés des niveaux de cuves (m³)</h3>
+    <div class="grid-4">
+        <div><label>Cuve n°1</label><input type="number" id="cuve1_debut" step="0.1"></div>
+        <div><label>Cuve n°2</label><input type="number" id="cuve2_debut" step="0.1"></div>
+    </div>
+
+    <h3>Relevés des compteurs horaires des groupes et consommations</h3>
+    <table>
+        <thead><tr><th>Groupe</th><th>Heures</th><th>Litres</th></tr></thead>
+        <tbody>
+            <tr data-ge="gea"><td>GE A</td><td><input type="number" id="gea_h_debut"></td><td><input type="number" id="gea_l_debut"></td></tr>
+            <tr data-ge="geb"><td>GE B</td><td><input type="number" id="geb_h_debut"></td><td><input type="number" id="geb_l_debut"></td></tr>
+            <tr data-ge="gec"><td>GE C</td><td><input type="number" id="gec_h_debut"></td><td><input type="number" id="gec_l_debut"></td></tr>
+            <tr data-ge="ged"><td>GE D</td><td><input type="number" id="ged_h_debut"></td><td><input type="number" id="ged_l_debut"></td></tr>
+        </tbody>
+    </table>
+
+    <h3>Relevés des compteurs électriques des groupes</h3>
+    <table>
+        <thead><tr><th>Groupe</th><th>Energies actives totales (kWh)</th><th>Energies réactives totales (kVAh)</th></tr></thead>
+        <tbody>
+            <tr data-ge="gea"><td>GE A</td><td><input type="number" id="gea_kwh_debut"></td><td><input type="number" id="gea_kvah_debut"></td></tr>
+            <tr data-ge="geb"><td>GE B</td><td><input type="number" id="geb_kwh_debut"></td><td><input type="number" id="geb_kvah_debut"></td></tr>
+            <tr data-ge="gec"><td>GE C</td><td><input type="number" id="gec_kwh_debut"></td><td><input type="number" id="gec_kvah_debut"></td></tr>
+            <tr data-ge="ged"><td>GE D</td><td><input type="number" id="ged_kwh_debut"></td><td><input type="number" id="ged_kvah_debut"></td></tr>
+        </tbody>
+    </table>
+
+    <!-- Sections GE A/B/C/D - abbreviated for brevity but keep structure; full fields as in original -->
+    <div id="section_gea">
+        <h2>GE A en fonctionnement</h2>
+        <div class="section-box">
+            <h3>Relevés paramètres de fonctionnement</h3>
+            <div class="grid-2" style="margin-bottom:12px;">
+                <div><label>Heures</label><input type="number" id="gea_h_run"></div>
+                <div><label>Litres</label><input type="number" id="gea_l_run"></div>
+            </div>
+            <table>
+                <thead><tr><th></th><th>Phase 1</th><th>Phase 2</th><th>Phase 3</th></tr></thead>
+                <tbody>
+                    <tr><td>Tensions (V)</td><td><input type="number" id="gea_v1"></td><td><input type="number" id="gea_v2"></td><td><input type="number" id="gea_v3"></td></tr>
+                    <tr><td>Intensités (A)</td><td><input type="number" id="gea_i1"></td><td><input type="number" id="gea_i2"></td><td><input type="number" id="gea_i3"></td></tr>
+                </tbody>
+            </table>
+            <div class="grid-3">
+                <div><label>Fréquence (Hz)</label><input type="number" id="gea_freq" step="0.01"></div>
+                <div><label>Cos φ</label><input type="number" id="gea_cos" step="0.01"></div>
+                <div><label>Puissance (kW)</label><input type="number" id="gea_kw"></div>
+                <div><label>Puissance apparente (kVA)</label><input type="number" id="gea_kva"></div>
+                <div><label>Puissance réactive (kVAR)</label><input type="number" id="gea_kvar"></div>
+                <div><label>Energie active totale (kWh)</label><input type="number" id="gea_kwh_run"></div>
+                <div><label>Energie réactive totale (kVAh)</label><input type="number" id="gea_kvah_run"></div>
+            </div>
+            <h3>MOTEUR</h3>
+            <div class="grid-4">
+                <div><label>Turbo mb</label><input type="number" id="gea_turbo"></div>
+                <div><label>Huile mb</label><input type="number" id="gea_huile"></div>
+                <div><label>Fioul mb</label><input type="number" id="gea_fioul"></div>
+                <div><label>T°c. eau HT (°C)</label><input type="number" id="gea_eau"></div>
+                <div><label>Ech (°C)</label><input type="number" id="gea_ech"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GE B -->
+    <div id="section_geb" style="display:none;">
+        <h2>GE B en fonctionnement</h2>
+        <div class="section-box">
+            <h3>Relevés paramètres de fonctionnement</h3>
+            <div class="grid-2" style="margin-bottom:12px;">
+                <div><label>Heures</label><input type="number" id="geb_h_run"></div>
+                <div><label>Litres</label><input type="number" id="geb_l_run"></div>
+            </div>
+            <table>
+                <thead><tr><th></th><th>Phase 1</th><th>Phase 2</th><th>Phase 3</th></tr></thead>
+                <tbody>
+                    <tr><td>Tensions (V)</td><td><input type="number" id="geb_v1"></td><td><input type="number" id="geb_v2"></td><td><input type="number" id="geb_v3"></td></tr>
+                    <tr><td>Intensités (A)</td><td><input type="number" id="geb_i1"></td><td><input type="number" id="geb_i2"></td><td><input type="number" id="geb_i3"></td></tr>
+                </tbody>
+            </table>
+            <div class="grid-3">
+                <div><label>Fréquence (Hz)</label><input type="number" id="geb_freq" step="0.01"></div>
+                <div><label>Cos φ</label><input type="number" id="geb_cos" step="0.01"></div>
+                <div><label>Puissance (kW)</label><input type="number" id="geb_kw"></div>
+                <div><label>Puissance apparente (kVA)</label><input type="number" id="geb_kva"></div>
+                <div><label>Puissance réactive (kVAR)</label><input type="number" id="geb_kvar"></div>
+                <div><label>Energie active totale (kWh)</label><input type="number" id="geb_kwh_run"></div>
+                <div><label>Energie réactive totale (kVAh)</label><input type="number" id="geb_kvah_run"></div>
+            </div>
+            <h3>MOTEUR</h3>
+            <div class="grid-4">
+                <div><label>Turbo mb</label><input type="number" id="geb_turbo"></div>
+                <div><label>Huile mb</label><input type="number" id="geb_huile"></div>
+                <div><label>Fioul mb</label><input type="number" id="geb_fioul"></div>
+                <div><label>T°c. eau HT (°C)</label><input type="number" id="geb_eau"></div>
+                <div><label>Ech (°C)</label><input type="number" id="geb_ech"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GE C -->
+    <div id="section_gec" style="display:none;">
+        <h2>GE C en fonctionnement</h2>
+        <div class="section-box">
+            <h3>Relevés paramètres de fonctionnement</h3>
+            <div class="grid-2" style="margin-bottom:12px;">
+                <div><label>Heures</label><input type="number" id="gec_h_run"></div>
+                <div><label>Litres</label><input type="number" id="gec_l_run"></div>
+            </div>
+            <table>
+                <thead><tr><th></th><th>Phase 1</th><th>Phase 2</th><th>Phase 3</th></tr></thead>
+                <tbody>
+                    <tr><td>Tensions (V)</td><td><input type="number" id="gec_v1"></td><td><input type="number" id="gec_v2"></td><td><input type="number" id="gec_v3"></td></tr>
+                    <tr><td>Intensités (A)</td><td><input type="number" id="gec_i1"></td><td><input type="number" id="gec_i2"></td><td><input type="number" id="gec_i3"></td></tr>
+                </tbody>
+            </table>
+            <div class="grid-3">
+                <div><label>Fréquence (Hz)</label><input type="number" id="gec_freq" step="0.01"></div>
+                <div><label>Cos φ</label><input type="number" id="gec_cos" step="0.01"></div>
+                <div><label>Puissance (kW)</label><input type="number" id="gec_kw"></div>
+                <div><label>Puissance apparente (kVA)</label><input type="number" id="gec_kva"></div>
+                <div><label>Puissance réactive (kVAR)</label><input type="number" id="gec_kvar"></div>
+                <div><label>Energie active totale (kWh)</label><input type="number" id="gec_kwh_run"></div>
+                <div><label>Energie réactive totale (kVAh)</label><input type="number" id="gec_kvah_run"></div>
+            </div>
+            <h3>MOTEUR</h3>
+            <div class="grid-4">
+                <div><label>Turbo mb</label><input type="number" id="gec_turbo"></div>
+                <div><label>Huile mb</label><input type="number" id="gec_huile"></div>
+                <div><label>Fioul mb</label><input type="number" id="gec_fioul"></div>
+                <div><label>T°c. eau HT (°C)</label><input type="number" id="gec_eau"></div>
+                <div><label>Ech (°C)</label><input type="number" id="gec_ech"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GE D -->
+    <div id="section_ged" style="display:none;">
+        <h2>GE D en fonctionnement</h2>
+        <div class="section-box">
+            <h3>Relevés paramètres de fonctionnement</h3>
+            <div class="grid-2" style="margin-bottom:12px;">
+                <div><label>Heures</label><input type="number" id="ged_h_run"></div>
+                <div><label>Litres</label><input type="number" id="ged_l_run"></div>
+            </div>
+            <table>
+                <thead><tr><th></th><th>Phase 1</th><th>Phase 2</th><th>Phase 3</th></tr></thead>
+                <tbody>
+                    <tr><td>Tensions (V)</td><td><input type="number" id="ged_v1"></td><td><input type="number" id="ged_v2"></td><td><input type="number" id="ged_v3"></td></tr>
+                    <tr><td>Intensités (A)</td><td><input type="number" id="ged_i1"></td><td><input type="number" id="ged_i2"></td><td><input type="number" id="ged_i3"></td></tr>
+                </tbody>
+            </table>
+            <div class="grid-3">
+                <div><label>Fréquence (Hz)</label><input type="number" id="ged_freq" step="0.01"></div>
+                <div><label>Cos φ</label><input type="number" id="ged_cos" step="0.01"></div>
+                <div><label>Puissance (kW)</label><input type="number" id="ged_kw"></div>
+                <div><label>Puissance apparente (kVA)</label><input type="number" id="ged_kva"></div>
+                <div><label>Puissance réactive (kVAR)</label><input type="number" id="ged_kvar"></div>
+                <div><label>Energie active totale (kWh)</label><input type="number" id="ged_kwh_run"></div>
+                <div><label>Energie réactive totale (kVAh)</label><input type="number" id="ged_kvah_run"></div>
+            </div>
+            <h3>MOTEUR</h3>
+            <div class="grid-4">
+                <div><label>Turbo mb</label><input type="number" id="ged_turbo"></div>
+                <div><label>Huile mb</label><input type="number" id="ged_huile"></div>
+                <div><label>Fioul mb</label><input type="number" id="ged_fioul"></div>
+                <div><label>T°c. eau HT (°C)</label><input type="number" id="ged_eau"></div>
+                <div><label>Ech (°C)</label><input type="number" id="ged_ech"></div>
+            </div>
+        </div>
+    </div>
+
+    <h2>FIN DES OPÉRATIONS</h2>
+    <h3>Relevés des niveaux de cuves (m³)</h3>
+    <div class="grid-4">
+        <div><label>Cuve n°1</label><input type="number" id="cuve1_fin" step="0.1"></div>
+        <div><label>Cuve n°2</label><input type="number" id="cuve2_fin" step="0.1"></div>
+    </div>
+
+    <h3>Relevés des compteurs horaires des groupes et consommations</h3>
+    <table>
+        <thead><tr><th>Groupe</th><th>Heures</th><th>Litres</th></tr></thead>
+        <tbody>
+            <tr data-ge="gea"><td>GE A</td><td><input type="number" id="gea_h_fin"></td><td><input type="number" id="gea_l_fin"></td></tr>
+            <tr data-ge="geb"><td>GE B</td><td><input type="number" id="geb_h_fin"></td><td><input type="number" id="geb_l_fin"></td></tr>
+            <tr data-ge="gec"><td>GE C</td><td><input type="number" id="gec_h_fin"></td><td><input type="number" id="gec_l_fin"></td></tr>
+            <tr data-ge="ged"><td>GE D</td><td><input type="number" id="ged_h_fin"></td><td><input type="number" id="ged_l_fin"></td></tr>
+        </tbody>
+    </table>
+
+    <h3>Relevés des compteurs électriques des groupes</h3>
+    <table>
+        <thead><tr><th>Groupe</th><th>Energies actives totales (kWh)</th><th>Energies réactives totales (kVAh)</th></tr></thead>
+        <tbody>
+            <tr data-ge="gea"><td>GE A</td><td><input type="number" id="gea_kwh_fin"></td><td><input type="number" id="gea_kvah_fin"></td></tr>
+            <tr data-ge="geb"><td>GE B</td><td><input type="number" id="geb_kwh_fin"></td><td><input type="number" id="geb_kvah_fin"></td></tr>
+            <tr data-ge="gec"><td>GE C</td><td><input type="number" id="gec_kwh_fin"></td><td><input type="number" id="gec_kvah_fin"></td></tr>
+            <tr data-ge="ged"><td>GE D</td><td><input type="number" id="ged_kwh_fin"></td><td><input type="number" id="ged_kvah_fin"></td></tr>
+        </tbody>
+    </table>
+
+    <h3>Consommation des GE (litres) — calcul automatique</h3>
+    <table>
+        <thead><tr><th>Groupe</th><th>Litres</th></tr></thead>
+        <tbody>
+            <tr data-ge="gea"><td>GE A</td><td><input type="number" id="gea_conso" readonly></td></tr>
+            <tr data-ge="geb"><td>GE B</td><td><input type="number" id="geb_conso" readonly></td></tr>
+            <tr data-ge="gec"><td>GE C</td><td><input type="number" id="gec_conso" readonly></td></tr>
+            <tr data-ge="ged"><td>GE D</td><td><input type="number" id="ged_conso" readonly></td></tr>
+        </tbody>
+    </table>
+    <p><strong>Soit une consommation de <span id="consoDisplay">0</span> litres pendant les essais.</strong></p>
+
+    <h2>Commentaires</h2>
+    <textarea id="commentaires" placeholder="Commentaires..."></textarea>
+
+    <h3 style="margin-top:16px;">Photos (optionnel)</h3>
+    <div class="grid-2">
+        <div>
+            <label>Photo 1</label>
+            <input type="file" id="photo1" name="photo1" accept="image/*" capture="environment">
+        </div>
+        <div>
+            <label>Photo 2</label>
+            <input type="file" id="photo2" name="photo2" accept="image/*" capture="environment">
+        </div>
+    </div>
+
+    <div class="actions">
+        <button type="button" onclick="saveData()">Enregistrer le rapport</button>
+    </div>
+    <div id="status"></div>
+</div>
+
+<script>
+function getAllData() {
+    const data = {};
+    document.querySelectorAll('input, textarea, select').forEach(el => {
+        if (el.id && el.type !== 'file') {
+            if (el.type === 'checkbox') data[el.id] = el.checked;
+            else data[el.id] = el.value;
+        }
+    });
+    return data;
+}
+
+function updateConsommations() {
+    const groupes = ['gea', 'geb', 'gec', 'ged'];
+    let total = 0;
+    groupes.forEach(g => {
+        const sel = document.getElementById('sel_' + g);
+        if (sel && !sel.checked) return;
+        const debut = parseFloat(document.getElementById(g + '_l_debut').value) || 0;
+        const fin = parseFloat(document.getElementById(g + '_l_fin').value) || 0;
+        const conso = Math.max(0, fin - debut);
+        const consoField = document.getElementById(g + '_conso');
+        if (consoField) consoField.value = conso;
+        total += conso;
+    });
+    const totalField = document.getElementById('consoTotale');
+    if (totalField) totalField.value = total;
+    const display = document.getElementById('consoDisplay');
+    if (display) display.textContent = total;
+}
+
+function toggleGE() {
+    const ges = ['gea', 'geb', 'gec', 'ged'];
+    ges.forEach(g => {
+        const checked = document.getElementById('sel_' + g).checked;
+        const section = document.getElementById('section_' + g);
+        if (section) section.style.display = checked ? '' : 'none';
+        document.querySelectorAll(`tr[data-ge="${g}"]`).forEach(tr => {
+            tr.style.display = checked ? '' : 'none';
+        });
+    });
+    updateConsommations();
+}
+
+async function saveData() {
+    const status = document.getElementById('status');
+    status.style.display = 'block';
+    status.className = '';
+    status.textContent = 'Envoi en cours...';
+
+    try {
+        const data = getAllData();
+        const formData = new FormData();
+        formData.append('data', JSON.stringify(data));
+
+        const photo1 = document.getElementById('photo1');
+        if (photo1.files[0]) formData.append('photo1', photo1.files[0]);
+        const photo2 = document.getElementById('photo2');
+        if (photo2.files[0]) formData.append('photo2', photo2.files[0]);
+
+        const response = await fetch('/submit', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            status.className = 'success';
+            status.textContent = '✅ Rapport enregistré avec succès ! (ID: ' + result.id + ')';
+            // Optionally reset form
+            // document.querySelectorAll('input, textarea, select').forEach(el => { if (el.type !== 'checkbox') el.value = ''; else if (el.id !== 'sel_gea') el.checked = false; });
+        } else {
+            status.className = 'error';
+            status.textContent = '❌ Erreur : ' + (result.error || 'Échec de l\'envoi');
+        }
+    } catch (err) {
+        status.className = 'error';
+        status.textContent = '❌ Erreur réseau : ' + err.message;
+    }
+}
+
+document.addEventListener('input', e => {
+    const id = e.target.id || '';
+    if (id.endsWith('_l_debut') || id.endsWith('_l_fin')) updateConsommations();
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const dateEl = document.getElementById('dateEssai');
+    if (dateEl) dateEl.value = today;
+    updateConsommations();
+    toggleGE();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Rapports GE</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #000; color: #f0f0f0; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #70bd95; padding-bottom: 15px; margin-bottom: 25px; }
+        h1 { color: #70bd95; margin: 0; }
+        a { color: #70bd95; text-decoration: none; }
+        table { width: 100%; border-collapse: collapse; background: #121212; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        th { background: #1e1e1e; color: #70bd95; }
+        tr:hover { background: #1a1a1a; }
+        .btn { background: #70bd95; color: #0f1419; padding: 10px 16px; border-radius: 5px; text-decoration: none; font-weight: 600; display: inline-block; margin-right: 10px; }
+        .btn:hover { background: #5aa87d; }
+        .btn-secondary { background: #3a4a5c; color: white; }
+        .btn-danger { background: #c0392b; color: white; }
+        .btn-danger:hover { background: #a93226; }
+        form { display: inline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Tableau de bord - Rapports Essais GE</h1>
+            <div>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">Déconnexion</a>
+            </div>
+        </header>
+        <p>{{ reports|length }} rapport(s) enregistré(s)</p>
+
+        <form method="get" action="{{ url_for('export_excel') }}" id="exportForm">
+            <button type="submit" class="btn" style="margin-bottom:15px;">Exporter la sélection en Excel</button>
+            <button type="button" class="btn btn-secondary" onclick="toggleAll(this)" style="margin-bottom:15px;">Tout sélectionner / désélectionner</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll" onclick="document.querySelectorAll('.report-check').forEach(c => c.checked = this.checked)"></th>
+                    <th>Date soumission</th>
+                    <th>Bâtiment</th>
+                    <th>Rédacteur</th>
+                    <th>Date essai</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reports %}
+                <tr>
+                    <td><input type="checkbox" class="report-check" name="ids" value="{{ r.id }}" form="exportForm"></td>
+                    <td>{{ r.submitted_at[:19] }}</td>
+                    <td>{{ r.batiment or '-' }}</td>
+                    <td>{{ r.redacteur or '-' }}</td>
+                    <td>{{ r.date_essai or '-' }}</td>
+                    <td>
+                        <a href="{{ url_for('view_report', report_id=r.id) }}" class="btn">Voir</a>
+                        <a href="{{ url_for('export_excel') }}?ids={{ r.id }}" class="btn">Télécharger</a>
+                        <form method="post" action="{{ url_for('delete_report', report_id=r.id) }}" onsubmit="return confirm('Supprimer définitivement ce rapport ?');" style="display:inline;">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" style="text-align:center;">Aucun rapport pour le moment</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    function toggleAll(btn) {
+        const checks = document.querySelectorAll('.report-check');
+        const allChecked = Array.from(checks).every(c => c.checked);
+        checks.forEach(c => c.checked = !allChecked);
+        document.getElementById('selectAll').checked = !allChecked;
+    }
+    </script>
