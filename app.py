@@ -14,7 +14,8 @@ app.secret_key = 'change-this-secret-key-in-production-ge-report-2026'
 
 # Simple admin user (change password!)
 ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD_HASH = 'scrypt:32768:8:1$7vlOZW4u4AiKuvmA$b2b68ff177a3cd69357539f11b4c7c18694d4929f97ebf2a31f069b4e5234ee9f95035d0bc86cc137825f4f05f96360e3626d84a9676a88bf46a6bfc3862b8ba'
+ADMIN_PASSWORD_HASH = generate_password_hash('admin123')  # Change this!
+
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -390,11 +391,25 @@ def export_excel():
         ws.merge_cells('B18:G18')
         ws.merge_cells('B22:G22')
 
+        # Nouvelles fusions demandées
+        for row in range(5, 8):
+            ws.merge_cells(f'F{row}:G{row}')
+        ws.merge_cells('B10:G14')
+        ws.merge_cells('B19:G19')
+        ws.merge_cells('B22:G24')
+
+        # Alignements spécifiques
+        top_center = Alignment(horizontal="center", vertical="top", wrap_text=True)
+        ws['B18'].alignment = top_center
+        ws['B19'].alignment = top_center
+
         # === SUPPRESSION DE LIGNES ===
         for row_num in sorted([216, 208, 200, 191], reverse=True):
             ws.delete_rows(row_num)
         # Supprimer les lignes 24 à 30 (après les autres suppressions, ajuster si besoin)
         ws.delete_rows(24, 7)  # Supprime 7 lignes à partir de la ligne 24
+        # Supprimer les lignes 29 et 30
+        ws.delete_rows(29, 2)
 
         # === CENTRAGE DE TOUT LE TEXTE ===
         center_align = Alignment(horizontal="center", vertical="center", wrap_text=True)
