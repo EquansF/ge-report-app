@@ -14,7 +14,7 @@ app.secret_key = 'change-this-secret-key-in-production-ge-report-2026'
 
 # Simple admin user (change password!)
 ADMIN_USERNAME = 'admin'
-ADMIN_PASSWORD_HASH = 'scrypt:32768:8:1$7vlOZW4u4AiKuvmA$b2b68ff177a3cd69357539f11b4c7c18694d4929f97ebf2a31f069b4e5234ee9f95035d0bc86cc137825f4f05f96360e3626d84a9676a88bf46a6bfc3862b8ba'
+ADMIN_PASSWORD_HASH = generate_password_hash('admin123')  # Change this!
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -203,81 +203,243 @@ def export_excel():
             ws = wb.copy_worksheet(template_ws)
             ws.title = f"Rapport_{r['id']}"
 
-        # Défusionner toutes les cellules pour pouvoir écrire librement
+        # Défusionner pour pouvoir écrire
         merged_ranges = list(ws.merged_cells.ranges)
         for merged in merged_ranges:
             ws.unmerge_cells(str(merged))
 
-        # Remplissage des valeurs (positions basées sur le modèle fourni)
-        # En-tête
-        ws['E2'] = f"Rédacteur : {data.get('redacteur', '')}"
-        ws['A6'] = f"COMPTE RENDU DES ESSAIS GE  Bâtiment : {data.get('batiment', '')}  Le : {data.get('dateEssai', '')}"
+        # === EN-TÊTE ===
+        ws['B10'] = f"COMPTE RENDU DES ESSAIS GE \nBâtiment : {data.get('batiment', '')}\nLe : {data.get('dateEssai', '')}"
+        ws['F6'] = f"Rédacteur : {data.get('redacteur', '')}"
 
-        # Résumé / consommation
-        ws['A13'] = f"La consommation totale lors de ces essais a été de {data.get('consoTotale', 0)} litres."
+        # === RÉSUMÉ ===
+        ws['B19'] = f"La consommation totale lors de ces essais a été de {data.get('consoTotale', 0)} litres."
 
-        # Problèmes
-        ws['A17'] = data.get('problemes', '')
+        # === PROBLÈMES ===
+        ws['B23'] = data.get('problemes', '')
 
-        # Cuves début
-        ws['B41'] = data.get('cuve1_debut', '')
-        ws['B42'] = data.get('cuve2_debut', '')
+        # === CUVES DÉBUT ===
+        ws['C53'] = data.get('cuve1_debut', '')
+        ws['C54'] = data.get('cuve2_debut', '')
 
-        # Compteurs horaires début (GE A à D)
-        base = 50
-        for i, ge in enumerate(['gea', 'geb', 'gec', 'ged']):
-            ws[f'B{base+i}'] = data.get(f'{ge}_h_debut', '')
-            ws[f'C{base+i}'] = data.get(f'{ge}_l_debut', '')
+        # === COMPTEURS HORAIRES DÉBUT ===
+        ws['C62'] = data.get('gea_h_debut', '')
+        ws['D62'] = data.get('gea_l_debut', '')
+        ws['C63'] = data.get('geb_h_debut', '')
+        ws['D63'] = data.get('geb_l_debut', '')
+        ws['C64'] = data.get('gec_h_debut', '')
+        ws['D64'] = data.get('gec_l_debut', '')
+        ws['C65'] = data.get('ged_h_debut', '')
+        ws['D65'] = data.get('ged_l_debut', '')
 
-        # Compteurs électriques début
-        base = 59
-        for i, ge in enumerate(['gea', 'geb', 'gec', 'ged']):
-            ws[f'B{base+i}'] = data.get(f'{ge}_kwh_debut', '')
-            ws[f'C{base+i}'] = data.get(f'{ge}_kvah_debut', '')
+        # === COMPTEURS ÉLECTRIQUES DÉBUT ===
+        ws['C72'] = data.get('gea_kwh_debut', '')
+        ws['E72'] = data.get('gea_kvah_debut', '')
+        ws['C73'] = data.get('geb_kwh_debut', '')
+        ws['E73'] = data.get('geb_kvah_debut', '')
+        ws['C74'] = data.get('gec_kwh_debut', '')
+        ws['E74'] = data.get('gec_kvah_debut', '')
+        ws['C75'] = data.get('ged_kwh_debut', '')
+        ws['E75'] = data.get('ged_kvah_debut', '')
 
-        # GE en fonctionnement - positions approximatives (à ajuster si besoin)
-        # GE A
-        ws['B69'] = data.get('gea_h_run', '')
-        ws['C69'] = data.get('gea_l_run', '')
-        ws['B71'] = data.get('gea_v1', '')
-        ws['C71'] = data.get('gea_v2', '')
-        ws['D71'] = data.get('gea_v3', '')
-        ws['B72'] = data.get('gea_i1', '')
-        ws['C72'] = data.get('gea_i2', '')
-        ws['D72'] = data.get('gea_i3', '')
-        ws['B73'] = data.get('gea_freq', '')
-        ws['B74'] = data.get('gea_cos', '')
-        ws['B75'] = data.get('gea_kw', '')
-        ws['B76'] = data.get('gea_kva', '')
-        ws['B77'] = data.get('gea_kvar', '')
-        ws['B78'] = data.get('gea_kwh_run', '')
-        ws['B79'] = data.get('gea_kvah_run', '')
-        ws['A82'] = data.get('gea_turbo', '')
-        ws['B82'] = data.get('gea_huile', '')
-        ws['C82'] = data.get('gea_fioul', '')
-        ws['D82'] = data.get('gea_eau', '')
-        ws['E82'] = data.get('gea_ech', '')
+        # === GE A ===
+        ws['C84'] = data.get('gea_h_run', '')
+        ws['D84'] = data.get('gea_l_run', '')
+        ws['D87'] = data.get('gea_v1', '')
+        ws['E87'] = data.get('gea_v2', '')
+        ws['F87'] = data.get('gea_v3', '')
+        ws['D88'] = data.get('gea_i1', '')
+        ws['E88'] = data.get('gea_i2', '')
+        ws['F88'] = data.get('gea_i3', '')
+        ws['D89'] = data.get('gea_freq', '')
+        ws['D90'] = data.get('gea_cos', '')
+        ws['D91'] = data.get('gea_kw', '')
+        ws['D92'] = data.get('gea_kva', '')
+        ws['D93'] = data.get('gea_kvar', '')
+        ws['D94'] = data.get('gea_kwh_run', '')
+        ws['D95'] = data.get('gea_kvah_run', '')
+        ws['B100'] = data.get('gea_turbo', '')
+        ws['C100'] = data.get('gea_huile', '')
+        ws['D100'] = data.get('gea_fioul', '')
+        ws['E100'] = data.get('gea_eau', '')
+        ws['F100'] = data.get('gea_ech', '')
 
-        # GE B (décalé)
-        offset = 20
-        ws[f'B{69+offset}'] = data.get('geb_h_run', '')
-        ws[f'C{69+offset}'] = data.get('geb_l_run', '')
-        # ... (on peut étendre de la même façon pour C et D)
+        # === GE B ===
+        ws['C107'] = data.get('geb_h_run', '')
+        ws['D107'] = data.get('geb_l_run', '')
+        ws['D110'] = data.get('geb_v1', '')
+        ws['E110'] = data.get('geb_v2', '')
+        ws['F110'] = data.get('geb_v3', '')
+        ws['D111'] = data.get('geb_i1', '')
+        ws['E111'] = data.get('geb_i2', '')
+        ws['F111'] = data.get('geb_i3', '')
+        ws['D112'] = data.get('geb_freq', '')
+        ws['D113'] = data.get('geb_cos', '')
+        ws['D114'] = data.get('geb_kw', '')
+        ws['D115'] = data.get('geb_kva', '')
+        ws['D116'] = data.get('geb_kvar', '')
+        ws['D117'] = data.get('geb_kwh_run', '')
+        ws['D118'] = data.get('geb_kvah_run', '')
+        ws['B123'] = data.get('geb_turbo', '')
+        ws['C123'] = data.get('geb_huile', '')
+        ws['D123'] = data.get('geb_fioul', '')
+        ws['E123'] = data.get('geb_eau', '')
+        ws['F123'] = data.get('geb_ech', '')
 
-        # Fin - cuves
-        # À adapter selon les lignes exactes du modèle
-        ws['B120'] = data.get('cuve1_fin', '')
-        ws['B121'] = data.get('cuve2_fin', '')
+        # === GE C ===
+        ws['C131'] = data.get('gec_h_run', '')
+        ws['D131'] = data.get('gec_l_run', '')
+        ws['D134'] = data.get('gec_v1', '')
+        ws['E134'] = data.get('gec_v2', '')
+        ws['F134'] = data.get('gec_v3', '')
+        ws['D135'] = data.get('gec_i1', '')
+        ws['E135'] = data.get('gec_i2', '')
+        ws['F135'] = data.get('gec_i3', '')
+        ws['D136'] = data.get('gec_freq', '')
+        ws['D137'] = data.get('gec_cos', '')
+        ws['D138'] = data.get('gec_kw', '')
+        ws['D139'] = data.get('gec_kva', '')
+        ws['D140'] = data.get('gec_kvar', '')
+        ws['D141'] = data.get('gec_kwh_run', '')
+        ws['D142'] = data.get('gec_kvah_run', '')
+        ws['B147'] = data.get('gec_turbo', '')
+        ws['C147'] = data.get('gec_huile', '')
+        ws['D147'] = data.get('gec_fioul', '')
+        ws['E147'] = data.get('gec_eau', '')
+        ws['F147'] = data.get('gec_ech', '')
+
+        # === GE D ===
+        ws['C154'] = data.get('ged_h_run', '')
+        ws['D154'] = data.get('ged_l_run', '')
+        ws['D157'] = data.get('ged_v1', '')
+        ws['E157'] = data.get('ged_v2', '')
+        ws['F157'] = data.get('ged_v3', '')
+        ws['D158'] = data.get('ged_i1', '')
+        ws['E158'] = data.get('ged_i2', '')
+        ws['F158'] = data.get('ged_i3', '')
+        ws['D159'] = data.get('ged_freq', '')
+        ws['D160'] = data.get('ged_cos', '')
+        ws['D161'] = data.get('ged_kw', '')
+        ws['D162'] = data.get('ged_kva', '')
+        ws['D163'] = data.get('ged_kvar', '')
+        ws['D164'] = data.get('ged_kwh_run', '')
+        ws['D165'] = data.get('ged_kvah_run', '')
+        ws['B170'] = data.get('ged_turbo', '')
+        ws['C170'] = data.get('ged_huile', '')
+        ws['D170'] = data.get('ged_fioul', '')
+        ws['E170'] = data.get('ged_eau', '')
+        ws['F170'] = data.get('ged_ech', '')
+
+        # === FIN DES OPÉRATIONS ===
+        ws['C179'] = data.get('cuve1_fin', '')
+        ws['C180'] = data.get('cuve2_fin', '')
+
+        # Compteurs horaires fin
+        ws['C187'] = data.get('gea_h_fin', '')
+        ws['D187'] = data.get('gea_l_fin', '')
+        ws['C188'] = data.get('geb_h_fin', '')
+        ws['D188'] = data.get('geb_l_fin', '')
+        ws['C189'] = data.get('gec_h_fin', '')
+        ws['D189'] = data.get('gec_l_fin', '')
+        ws['C190'] = data.get('ged_h_fin', '')
+        ws['D190'] = data.get('ged_l_fin', '')
+
+        # Compteurs électriques fin
+        ws['C196'] = data.get('gea_kwh_fin', '')
+        ws['D196'] = data.get('gea_kvah_fin', '')
+        ws['C197'] = data.get('geb_kwh_fin', '')
+        ws['D197'] = data.get('geb_kvah_fin', '')
+        ws['C198'] = data.get('gec_kwh_fin', '')
+        ws['D198'] = data.get('gec_kvah_fin', '')
+        ws['C199'] = data.get('ged_kwh_fin', '')
+        ws['D199'] = data.get('ged_kvah_fin', '')
 
         # Consommations
-        ws['B130'] = data.get('gea_conso', '')
-        ws['B131'] = data.get('geb_conso', '')
-        ws['B132'] = data.get('gec_conso', '')
-        ws['B133'] = data.get('ged_conso', '')
-        ws['A135'] = f"Soit une consommation de {data.get('consoTotale', 0)} litres pendant les essais."
+        ws['C204'] = data.get('gea_conso', '')
+        ws['C205'] = data.get('geb_conso', '')
+        ws['C206'] = data.get('gec_conso', '')
+        ws['C207'] = data.get('ged_conso', '')
+        ws['B210'] = f"Soit une consommation de {data.get('consoTotale', 0)} litres pendant les essais."
 
         # Commentaires
-        ws['A138'] = data.get('commentaires', '')
+        ws['B213'] = data.get('commentaires', '')
+
+        # === FUSIONS DEMANDÉES ===
+        # B87:B95 avec C
+        for row in range(87, 96):
+            ws.merge_cells(f'B{row}:C{row}')
+
+        # B110:B118 avec C
+        for row in range(110, 119):
+            ws.merge_cells(f'B{row}:C{row}')
+
+        # B134:B142 avec C
+        for row in range(134, 143):
+            ws.merge_cells(f'B{row}:C{row}')
+
+        # B157:B165 avec C
+        for row in range(157, 166):
+            ws.merge_cells(f'B{row}:C{row}')
+
+        # B202 avec C
+        ws.merge_cells('B202:C202')
+
+        # B210 jusqu'à E210
+        ws.merge_cells('B210:E210')
+
+        # === FUSIONS SUPPLÉMENTAIRES ===
+        ws.merge_cells('B18:G18')
+        ws.merge_cells('B22:G22')
+
+        # === SUPPRESSION DE LIGNES ===
+        for row_num in sorted([216, 208, 200, 191], reverse=True):
+            ws.delete_rows(row_num)
+        # Supprimer les lignes 24 à 30 (après les autres suppressions, ajuster si besoin)
+        ws.delete_rows(24, 7)  # Supprime 7 lignes à partir de la ligne 24
+
+        # === CENTRAGE DE TOUT LE TEXTE ===
+        center_align = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=7):
+            for cell in row:
+                if cell.value is not None:
+                    cell.alignment = center_align
+
+        # === ENCADREMENTS (bordures extérieures uniquement) ===
+        thin = Border(
+            left=Side(style='thin'),
+            right=Side(style='thin'),
+            top=Side(style='thin'),
+            bottom=Side(style='thin')
+        )
+        # Bordure extérieure B10:G14
+        for row in range(10, 15):
+            for col in range(2, 8):  # B à G
+                cell = ws.cell(row=row, column=col)
+                border = Border()
+                if row == 10:
+                    border.top = Side(style='thin')
+                if row == 14:
+                    border.bottom = Side(style='thin')
+                if col == 2:
+                    border.left = Side(style='thin')
+                if col == 7:
+                    border.right = Side(style='thin')
+                cell.border = border
+
+        # Bordure extérieure B16:G20
+        for row in range(16, 21):
+            for col in range(2, 8):
+                cell = ws.cell(row=row, column=col)
+                border = Border()
+                if row == 16:
+                    border.top = Side(style='thin')
+                if row == 20:
+                    border.bottom = Side(style='thin')
+                if col == 2:
+                    border.left = Side(style='thin')
+                if col == 7:
+                    border.right = Side(style='thin')
+                cell.border = border
 
     output = io.BytesIO()
     wb.save(output)
