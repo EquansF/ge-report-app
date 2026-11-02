@@ -381,7 +381,16 @@ def export_excel():
             'B184:E184',
             'B173:G173', 'B149:G149', 'B126:G126', 'B102:G102', 'B79:G79',
             'B81:E81',
-            'B46:G46', 'B50:C50', 'B59:E59'
+            'B46:G46', 'B50:C50', 'B59:E59',
+            # Lignes 52-56 : C:D
+            'C52:D52', 'C53:D53', 'C54:D54', 'C55:D55', 'C56:D56',
+            # Lignes 71-76 : C:D et E:F
+            'C71:D71', 'E71:F71',
+            'C72:D72', 'E72:F72',
+            'C73:D73', 'E73:F73',
+            'C74:D74', 'E74:F74',
+            'C75:D75', 'E75:F75',
+            'C76:D76', 'E76:F76'
         ]
         for m in merges:
             try:
@@ -414,7 +423,7 @@ def export_excel():
                 ws[cell_ref].alignment = top_center
             # Alignements gauche + haut
             left_top = Alignment(horizontal="left", vertical="top", wrap_text=True)
-            for cell_ref in ['B19', 'B81', 'B50', 'B59']:
+            for cell_ref in ['B19', 'B81', 'B50', 'B59', 'B212']:
                 try:
                     ws[cell_ref].alignment = left_top
                 except:
