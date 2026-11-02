@@ -531,11 +531,16 @@ async function saveData() {
             status.textContent = '✅ Rapport enregistré avec succès ! (ID: ' + result.id + ')';
             status.style.display = 'block';
             // Réinitialiser les champs manuellement
-            document.querySelectorAll('input:not([type=checkbox]):not([type=submit]):not([type=button]), textarea, select').forEach(el => {
-                if (el.id !== 'dateEssai') el.value = '';
-            });
+            const bat = document.getElementById('batiment');
+            if (bat) bat.value = '';
+            const red = document.getElementById('redacteur');
+            if (red) red.value = '';
             const dateEl = document.getElementById('dateEssai');
             if (dateEl) dateEl.value = new Date().toISOString().slice(0, 10);
+
+            document.querySelectorAll('input:not([type=checkbox]):not([type=submit]):not([type=button]), textarea').forEach(el => {
+                if (el.id !== 'dateEssai' && el.id !== 'batiment' && el.id !== 'redacteur') el.value = '';
+            });
             document.querySelectorAll('input[type=checkbox]').forEach(el => {
                 if (el.id !== 'sel_gea') el.checked = false;
                 else el.checked = true;
