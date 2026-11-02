@@ -197,36 +197,35 @@ def export_excel():
 
     # Pour plusieurs rapports, on duplique la feuille
     for idx, r in enumerate(reports):
-        try:
-            data = json.loads(r['data_json'])
-            if idx == 0:
-                ws = template_ws
-                ws.title = f"Rapport_{r['id']}"
-            else:
-                ws = wb.copy_worksheet(template_ws)
-                ws.title = f"Rapport_{r['id']}"
+        data = json.loads(r['data_json'])
+        if idx == 0:
+            ws = template_ws
+            ws.title = f"Rapport_{r['id']}"
+        else:
+            ws = wb.copy_worksheet(template_ws)
+            ws.title = f"Rapport_{r['id']}"
 
-            # Défusionner pour pouvoir écrire
-            merged_ranges = list(ws.merged_cells.ranges)
-            for merged in merged_ranges:
-                try:
-                    ws.unmerge_cells(str(merged))
-                except:
-                    pass
-
-            # === EN-TÊTE ===
-            date_str = data.get('dateEssai', '')
+        # Défusionner pour pouvoir écrire
+        merged_ranges = list(ws.merged_cells.ranges)
+        for merged in merged_ranges:
             try:
-                if date_str:
-                    d = datetime.strptime(date_str, '%Y-%m-%d')
-                    mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']
-                    date_fr = f"{d.day} {mois[d.month-1]} {d.year}"
-                else:
-                    date_fr = ''
+                ws.unmerge_cells(str(merged))
             except:
-                date_fr = date_str
-            ws['B10'] = f"COMPTE RENDU DES ESSAIS GE \nBâtiment : {data.get('batiment', '')}\nLe : {date_fr}"
-            ws['F6'] = f"Rédacteur : {data.get('redacteur', '')}"
+                pass
+
+        # === EN-TÊTE ===
+        date_str = data.get('dateEssai', '')
+        try:
+            if date_str:
+                d = datetime.strptime(date_str, '%Y-%m-%d')
+                mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']
+                date_fr = f"{d.day} {mois[d.month-1]} {d.year}"
+            else:
+                date_fr = ''
+        except:
+            date_fr = date_str
+        ws['B10'] = f"COMPTE RENDU DES ESSAIS GE \nBâtiment : {data.get('batiment', '')}\nLe : {date_fr}"
+        ws['F6'] = f"Rédacteur : {data.get('redacteur', '')}"
 
         # === RÉSUMÉ ===
         ws['B19'] = f"La consommation totale lors de ces essais a été de {data.get('consoTotale', 0)} litres."
@@ -466,10 +465,6 @@ def export_excel():
                     cell.border = border
                 except:
                     pass
-
-        except Exception as e:
-            print(f"Erreur génération rapport {r['id']}: {e}")
-            continue
 
     output = io.BytesIO()
     wb.save(output)
