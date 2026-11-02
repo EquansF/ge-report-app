@@ -375,7 +375,12 @@ def export_excel():
             'B157:C157', 'B158:C158', 'B159:C159', 'B160:C160', 'B161:C161', 'B162:C162', 'B163:C163', 'B164:C164', 'B165:C165',
             'B202:C202',
             # Fusions B:C:D demandées
-            'B69:D69', 'B104:D104', 'B128:D128', 'B151:D151', 'B176:D176', 'B193:D193'
+            'B69:D69', 'B104:D104', 'B128:D128', 'B151:D151', 'B176:D176', 'B193:D193',
+            # Nouvelles fusions
+            'B212:G212', 'B213:G215',
+            'B184:E184',
+            'B173:G173', 'B149:G149', 'B126:G126', 'B102:G102', 'B79:G79',
+            'B81:E81'
         ]
         for m in merges:
             try:
@@ -402,6 +407,10 @@ def export_excel():
             ws['F5'].alignment = bottom
             ws['F6'].alignment = bottom
             ws['F7'].alignment = bottom
+            # Alignements top + center demandés
+            top_center = Alignment(horizontal="center", vertical="top", wrap_text=True)
+            for cell_ref in ['B202', 'B173', 'B149', 'B126', 'B102', 'B79']:
+                ws[cell_ref].alignment = top_center
         except Exception:
             pass
 
