@@ -411,6 +411,18 @@ def export_excel():
             top_center = Alignment(horizontal="center", vertical="top", wrap_text=True)
             for cell_ref in ['B202', 'B173', 'B149', 'B126', 'B102', 'B79']:
                 ws[cell_ref].alignment = top_center
+            # Alignements gauche + haut
+            left_top = Alignment(horizontal="left", vertical="top", wrap_text=True)
+            for cell_ref in ['B19', 'B5', 'B6', 'B7', 'B81']:
+                try:
+                    ws[cell_ref].alignment = left_top
+                except:
+                    pass
+            # Ligne 46 : centré
+            try:
+                ws['B46'].alignment = center
+            except:
+                pass
         except Exception:
             pass
 
