@@ -436,13 +436,19 @@ def export_excel():
                     ws[cell_ref].alignment = left_top
                 except:
                     pass
-            # Lignes 5, 6, 7 : gauche + centre vertical
+            # Lignes 5, 6, 7 : gauche + centre vertical (comme le modèle)
             left_center = Alignment(horizontal="left", vertical="center", wrap_text=True)
             for cell_ref in ['B5', 'B6', 'B7', 'F5', 'F6', 'F7', 'B16']:
                 try:
                     ws[cell_ref].alignment = left_center
                 except:
                     pass
+            # Nettoyage éventuel de B6
+            try:
+                if ws['B6'].value in (None, ''):
+                    ws['B6'].border = Border()
+            except:
+                pass
             # Ligne 46 : centré horizontal + vertical
             try:
                 ws['B46'].alignment = center
