@@ -413,12 +413,19 @@ def export_excel():
                 ws[cell_ref].alignment = top_center
             # Alignements gauche + haut
             left_top = Alignment(horizontal="left", vertical="top", wrap_text=True)
-            for cell_ref in ['B19', 'B5', 'B6', 'B7', 'B81']:
+            for cell_ref in ['B19', 'B81', 'B50', 'B59']:
                 try:
                     ws[cell_ref].alignment = left_top
                 except:
                     pass
-            # Ligne 46 : centré
+            # Lignes 5, 6, 7 : gauche + centre vertical
+            left_center = Alignment(horizontal="left", vertical="center", wrap_text=True)
+            for cell_ref in ['B5', 'B6', 'B7', 'F5', 'F6', 'F7', 'B16']:
+                try:
+                    ws[cell_ref].alignment = left_center
+                except:
+                    pass
+            # Ligne 46 : centré horizontal + vertical
             try:
                 ws['B46'].alignment = center
             except:
