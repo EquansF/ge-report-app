@@ -188,14 +188,13 @@ def export_excel():
     if not reports:
         return "Aucun rapport sélectionné", 400
 
-    # Charger le modèle
     template_path = os.path.join(os.path.dirname(__file__), 'template.xlsx')
     if not os.path.exists(template_path):
-        return "Fichier template.xlsx manquant", 500
+        return "template.xlsx manquant", 500
+
     wb = load_workbook(template_path)
     template_ws = wb.active
 
-    # Pour plusieurs rapports, on duplique la feuille
     for idx, r in enumerate(reports):
         data = json.loads(r['data_json'])
         if idx == 0:
@@ -205,15 +204,14 @@ def export_excel():
             ws = wb.copy_worksheet(template_ws)
             ws.title = f"Rapport_{r['id']}"
 
-        # Défusionner pour pouvoir écrire
-        merged_ranges = list(ws.merged_cells.ranges)
-        for merged in merged_ranges:
+        # Défusionner pour écrire librement
+        for merged in list(ws.merged_cells.ranges):
             try:
                 ws.unmerge_cells(str(merged))
             except:
                 pass
 
-        # === EN-TÊTE ===
+        # Date en français
         date_str = data.get('dateEssai', '')
         try:
             if date_str:
@@ -224,20 +222,18 @@ def export_excel():
                 date_fr = ''
         except:
             date_fr = date_str
+
+        # Remplissage fidèle au template
         ws['B10'] = f"COMPTE RENDU DES ESSAIS GE \nBâtiment : {data.get('batiment', '')}\nLe : {date_fr}"
         ws['F6'] = f"Rédacteur : {data.get('redacteur', '')}"
-
-        # === RÉSUMÉ ===
         ws['B19'] = f"La consommation totale lors de ces essais a été de {data.get('consoTotale', 0)} litres."
-
-        # === PROBLÈMES ===
         ws['B23'] = data.get('problemes', '')
 
-        # === CUVES DÉBUT ===
+        # Cuves début
         ws['C53'] = data.get('cuve1_debut', '')
         ws['C54'] = data.get('cuve2_debut', '')
 
-        # === COMPTEURS HORAIRES DÉBUT ===
+        # Compteurs horaires début
         ws['C62'] = data.get('gea_h_debut', '')
         ws['D62'] = data.get('gea_l_debut', '')
         ws['C63'] = data.get('geb_h_debut', '')
@@ -247,7 +243,7 @@ def export_excel():
         ws['C65'] = data.get('ged_h_debut', '')
         ws['D65'] = data.get('ged_l_debut', '')
 
-        # === COMPTEURS ÉLECTRIQUES DÉBUT ===
+        # Compteurs électriques début
         ws['C72'] = data.get('gea_kwh_debut', '')
         ws['E72'] = data.get('gea_kvah_debut', '')
         ws['C73'] = data.get('geb_kwh_debut', '')
@@ -257,7 +253,7 @@ def export_excel():
         ws['C75'] = data.get('ged_kwh_debut', '')
         ws['E75'] = data.get('ged_kvah_debut', '')
 
-        # === GE A ===
+        # GE A
         ws['C84'] = data.get('gea_h_run', '')
         ws['D84'] = data.get('gea_l_run', '')
         ws['D87'] = data.get('gea_v1', '')
@@ -279,7 +275,7 @@ def export_excel():
         ws['E100'] = data.get('gea_eau', '')
         ws['F100'] = data.get('gea_ech', '')
 
-        # === GE B ===
+        # GE B
         ws['C107'] = data.get('geb_h_run', '')
         ws['D107'] = data.get('geb_l_run', '')
         ws['D110'] = data.get('geb_v1', '')
@@ -301,7 +297,7 @@ def export_excel():
         ws['E123'] = data.get('geb_eau', '')
         ws['F123'] = data.get('geb_ech', '')
 
-        # === GE C ===
+        # GE C
         ws['C131'] = data.get('gec_h_run', '')
         ws['D131'] = data.get('gec_l_run', '')
         ws['D134'] = data.get('gec_v1', '')
@@ -323,7 +319,7 @@ def export_excel():
         ws['E147'] = data.get('gec_eau', '')
         ws['F147'] = data.get('gec_ech', '')
 
-        # === GE D ===
+        # GE D
         ws['C154'] = data.get('ged_h_run', '')
         ws['D154'] = data.get('ged_l_run', '')
         ws['D157'] = data.get('ged_v1', '')
@@ -345,11 +341,9 @@ def export_excel():
         ws['E170'] = data.get('ged_eau', '')
         ws['F170'] = data.get('ged_ech', '')
 
-        # === FIN DES OPÉRATIONS ===
+        # Fin
         ws['C179'] = data.get('cuve1_fin', '')
         ws['C180'] = data.get('cuve2_fin', '')
-
-        # Compteurs horaires fin
         ws['C187'] = data.get('gea_h_fin', '')
         ws['D187'] = data.get('gea_l_fin', '')
         ws['C188'] = data.get('geb_h_fin', '')
@@ -358,8 +352,6 @@ def export_excel():
         ws['D189'] = data.get('gec_l_fin', '')
         ws['C190'] = data.get('ged_h_fin', '')
         ws['D190'] = data.get('ged_l_fin', '')
-
-        # Compteurs électriques fin
         ws['C196'] = data.get('gea_kwh_fin', '')
         ws['D196'] = data.get('gea_kvah_fin', '')
         ws['C197'] = data.get('geb_kwh_fin', '')
@@ -368,95 +360,31 @@ def export_excel():
         ws['D198'] = data.get('gec_kvah_fin', '')
         ws['C199'] = data.get('ged_kwh_fin', '')
         ws['D199'] = data.get('ged_kvah_fin', '')
-
-        # Consommations
         ws['C204'] = data.get('gea_conso', '')
         ws['C205'] = data.get('geb_conso', '')
         ws['C206'] = data.get('gec_conso', '')
         ws['C207'] = data.get('ged_conso', '')
         ws['B210'] = f"Soit une consommation de {data.get('consoTotale', 0)} litres pendant les essais."
-
-        # Commentaires
         ws['B213'] = data.get('commentaires', '')
 
-        # === SUPPRESSION DE LIGNES ===
-        for row_num in sorted([216, 208, 200, 191], reverse=True):
-            ws.delete_rows(row_num)
-        ws.delete_rows(24, 7)
-        ws.delete_rows(29, 2)
-
-        # === CENTRAGE DE TOUT LE TEXTE ===
-        center_align = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        # Centrage
+        center = Alignment(horizontal="center", vertical="center", wrap_text=True)
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=7):
             for cell in row:
                 if cell.value is not None:
                     try:
-                        cell.alignment = center_align
+                        cell.alignment = center
                     except:
                         pass
 
-        # Alignements spécifiques demandés
-        bottom_align = Alignment(horizontal="center", vertical="bottom", wrap_text=True)
-        top_left = Alignment(horizontal="left", vertical="top", wrap_text=True)
-        try:
-            ws['F5'].alignment = bottom_align
-            ws['F6'].alignment = bottom_align
-            ws['F7'].alignment = bottom_align
-        except:
-            pass
-        try:
-            ws['B18'].alignment = top_left
-        except:
-            pass
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)
 
-        # Fusions demandées
-        try:
-            ws.merge_cells('B16:G16')
-            ws.merge_cells('B22:G31')
-            ws['B22'].alignment = top_left
-        except:
-            pass
+    filename = f"rapports_ge_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    return send_file(output, download_name=filename, as_attachment=True,
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-        # === ENCADREMENTS (bordures extérieures uniquement) ===
-        thin = Border(
-            left=Side(style='thin'),
-            right=Side(style='thin'),
-            top=Side(style='thin'),
-            bottom=Side(style='thin')
-        )
-        # Bordure extérieure B10:G14
-        for row in range(10, 15):
-            for col in range(2, 8):
-                cell = ws.cell(row=row, column=col)
-                border = Border()
-                if row == 10:
-                    border.top = Side(style='thin')
-                if row == 14:
-                    border.bottom = Side(style='thin')
-                if col == 2:
-                    border.left = Side(style='thin')
-                if col == 7:
-                    border.right = Side(style='thin')
-                try:
-                    cell.border = border
-                except:
-                    pass
-
-        # Bordure extérieure B16:G20
-        for row in range(16, 21):
-            for col in range(2, 8):
-                cell = ws.cell(row=row, column=col)
-                border = Border()
-                if row == 16:
-                    border.top = Side(style='thin')
-                if row == 20:
-                    border.bottom = Side(style='thin')
-                if col == 2:
-                    border.left = Side(style='thin')
-                if col == 7:
-                    border.right = Side(style='thin')
-                try:
-                    cell.border = border
                 except:
                     pass
 
