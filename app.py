@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, s
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from openpyxl import Workbook, load_workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.drawing.image import Image as XLImage
 import io
 
 app = Flask(__name__)
@@ -203,6 +203,18 @@ def export_excel():
         else:
             ws = wb.copy_worksheet(template_ws)
             ws.title = f"Rapport_{r['id']}"
+
+        # Logo Equans (A1:C6)
+        try:
+            logo_path = os.path.join(os.path.dirname(__file__), 'logo.jpg')
+            if os.path.exists(logo_path):
+                img = XLImage(logo_path)
+                # Ajuster la taille pour couvrir A1:C6 approximativement
+                img.width = 180
+                img.height = 90
+                ws.add_image(img, 'A1')
+        except Exception:
+            pass
 
         # Défusionner proprement
         for merged in list(ws.merged_cells.ranges):
