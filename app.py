@@ -431,7 +431,7 @@ def export_excel():
                 ws[cell_ref].alignment = top_center
             # Alignements gauche + haut
             left_top = Alignment(horizontal="left", vertical="top", wrap_text=True)
-            for cell_ref in ['B19', 'B81', 'B50', 'B59', 'B212', 'B97', 'B120', 'B144', 'B167']:
+            for cell_ref in ['B19', 'B81', 'B50', 'B59', 'B212', 'B97', 'B120', 'B144', 'B167', 'B34', 'D34', 'F34', 'B39', 'D39', 'F39']:
                 try:
                     ws[cell_ref].alignment = left_top
                 except:
