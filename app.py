@@ -171,6 +171,20 @@ def delete_report(report_id):
     return redirect(url_for('admin'))
 
 
+@app.route('/admin/delete-multiple', methods=['POST'])
+@login_required
+def delete_multiple():
+    ids = request.form.getlist('ids')
+    if not ids:
+        return redirect(url_for('admin'))
+    conn = get_db()
+    c = conn.cursor()
+    placeholders = ','.join('?' * len(ids))
+    c.execute(f'DELETE FROM reports WHERE id IN ({placeholders})', ids)
+    conn.commit()
+    conn.close()
+    return redirect(url_for('admin'))
+
 @app.route('/admin/export')
 @login_required
 def export_excel():
