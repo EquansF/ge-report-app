@@ -204,17 +204,17 @@ def export_excel():
             ws = wb.copy_worksheet(template_ws)
             ws.title = f"Rapport_{r['id']}"
 
-        # Logo Equans (A1:C6)
+        # Logo Equans (A1:C6) - version sécurisée
         try:
             logo_path = os.path.join(os.path.dirname(__file__), 'logo.jpg')
             if os.path.exists(logo_path):
+                from openpyxl.drawing.image import Image as XLImage
                 img = XLImage(logo_path)
-                # Ajuster la taille pour couvrir A1:C6 approximativement
                 img.width = 180
                 img.height = 90
                 ws.add_image(img, 'A1')
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Logo non inséré : {e}")
 
         # Défusionner proprement
         for merged in list(ws.merged_cells.ranges):
