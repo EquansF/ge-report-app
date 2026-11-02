@@ -530,8 +530,13 @@ async function saveData() {
             status.className = 'success';
             status.textContent = '✅ Rapport enregistré avec succès ! (ID: ' + result.id + ')';
             status.style.display = 'block';
-            // Réinitialiser le formulaire
-            document.querySelector('form').reset();
+            // Réinitialiser les champs manuellement
+            document.querySelectorAll('input:not([type=checkbox]):not([type=submit]):not([type=button]), textarea').forEach(el => {
+                if (el.id !== 'dateEssai') el.value = '';
+            });
+            document.querySelectorAll('input[type=checkbox]').forEach(el => {
+                if (el.id !== 'sel_gea') el.checked = false;
+            });
             // Masquer après 10 secondes
             setTimeout(() => { status.style.display = 'none'; }, 10000);
         } else {
