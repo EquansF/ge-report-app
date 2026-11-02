@@ -34,6 +34,7 @@
         <form method="get" action="{{ url_for('export_excel') }}" id="exportForm">
             <button type="submit" class="btn" style="margin-bottom:15px;">Exporter la sélection en Excel</button>
             <button type="button" class="btn btn-secondary" onclick="toggleAll(this)" style="margin-bottom:15px;">Tout sélectionner / désélectionner</button>
+            <button type="button" class="btn btn-danger" onclick="deleteSelected()" style="margin-bottom:15px;">Supprimer la sélection</button>
         </form>
 
         <table>
@@ -51,7 +52,7 @@
                 {% for r in reports %}
                 <tr>
                     <td><input type="checkbox" class="report-check" name="ids" value="{{ r.id }}" form="exportForm"></td>
-                    <td>{{ r.submitted_at[:19] }}</td>
+                    <td>{{ r.submitted_at_fr }}</td>
                     <td>{{ r.batiment or '-' }}</td>
                     <td>{{ r.redacteur or '-' }}</td>
                     <td>{{ r.date_essai or '-' }}</td>
@@ -76,5 +77,28 @@
         const allChecked = Array.from(checks).every(c => c.checked);
         checks.forEach(c => c.checked = !allChecked);
         document.getElementById('selectAll').checked = !allChecked;
+    }
+
+    function deleteSelected() {
+        const checks = document.querySelectorAll('.report-check:checked');
+        if (checks.length === 0) {
+            alert('Veuillez sélectionner au moins un rapport.');
+            return;
+        }
+        if (!confirm(`Supprimer définitivement ${checks.length} rapport(s) ?`)) return;
+
+        const ids = Array.from(checks).map(c => c.value);
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/admin/delete-multiple';
+        ids.forEach(id => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ids';
+            input.value = id;
+            form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
     }
     </script>
