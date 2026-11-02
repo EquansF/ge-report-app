@@ -590,10 +590,21 @@ window.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().slice(0, 10);
     const dateEl = document.getElementById('dateEssai');
     if (dateEl) dateEl.value = today;
-    // Réinitialiser tous les champs au chargement
+
+    // Réinitialiser complètement au chargement
+    const bat = document.getElementById('batiment');
+    if (bat) bat.value = '';
+    const red = document.getElementById('redacteur');
+    if (red) red.value = '';
+
     document.querySelectorAll('input:not([type=checkbox]):not([type=submit]):not([type=button]), textarea').forEach(el => {
-        if (el.id !== 'dateEssai') el.value = '';
+        if (el.id !== 'dateEssai' && el.id !== 'batiment' && el.id !== 'redacteur') el.value = '';
     });
+    document.querySelectorAll('input[type=checkbox]').forEach(el => {
+        if (el.id !== 'sel_gea') el.checked = false;
+        else el.checked = true;
+    });
+
     updateConsommations();
     toggleGE();
 });
