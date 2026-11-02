@@ -204,11 +204,11 @@ def export_excel():
             ws = wb.copy_worksheet(template_ws)
             ws.title = f"Rapport_{r['id']}"
 
-        # Défusionner pour écrire librement
+        # Défusionner proprement
         for merged in list(ws.merged_cells.ranges):
             try:
                 ws.unmerge_cells(str(merged))
-            except:
+            except Exception:
                 pass
 
         # Date en français
@@ -220,20 +220,18 @@ def export_excel():
                 date_fr = f"{d.day} {mois[d.month-1]} {d.year}"
             else:
                 date_fr = ''
-        except:
+        except Exception:
             date_fr = date_str
 
-        # Remplissage fidèle au template
+        # Remplissage
         ws['B10'] = f"COMPTE RENDU DES ESSAIS GE \nBâtiment : {data.get('batiment', '')}\nLe : {date_fr}"
         ws['F6'] = f"Rédacteur : {data.get('redacteur', '')}"
         ws['B19'] = f"La consommation totale lors de ces essais a été de {data.get('consoTotale', 0)} litres."
         ws['B23'] = data.get('problemes', '')
 
-        # Cuves début
         ws['C53'] = data.get('cuve1_debut', '')
         ws['C54'] = data.get('cuve2_debut', '')
 
-        # Compteurs horaires début
         ws['C62'] = data.get('gea_h_debut', '')
         ws['D62'] = data.get('gea_l_debut', '')
         ws['C63'] = data.get('geb_h_debut', '')
@@ -243,7 +241,6 @@ def export_excel():
         ws['C65'] = data.get('ged_h_debut', '')
         ws['D65'] = data.get('ged_l_debut', '')
 
-        # Compteurs électriques début
         ws['C72'] = data.get('gea_kwh_debut', '')
         ws['E72'] = data.get('gea_kvah_debut', '')
         ws['C73'] = data.get('geb_kwh_debut', '')
@@ -367,16 +364,61 @@ def export_excel():
         ws['B210'] = f"Soit une consommation de {data.get('consoTotale', 0)} litres pendant les essais."
         ws['B213'] = data.get('commentaires', '')
 
-        # Centrage
+        # Fusions sûres
+        merges = [
+            'B10:G14', 'B16:G16', 'B18:G18', 'B19:G19', 'B22:G31',
+            'F5:G5', 'F6:G6', 'F7:G7', 'B210:E210'
+        ]
+        for m in merges:
+            try:
+                ws.merge_cells(m)
+            except Exception:
+                pass
+
+        # Alignements
         center = Alignment(horizontal="center", vertical="center", wrap_text=True)
+        top_left = Alignment(horizontal="left", vertical="top", wrap_text=True)
+        bottom = Alignment(horizontal="center", vertical="bottom", wrap_text=True)
+
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=7):
             for cell in row:
                 if cell.value is not None:
                     try:
                         cell.alignment = center
-                    except:
+                    except Exception:
                         pass
 
+        try:
+            ws['B18'].alignment = top_left
+            ws['B22'].alignment = top_left
+            ws['F5'].alignment = bottom
+            ws['F6'].alignment = bottom
+            ws['F7'].alignment = bottom
+        except Exception:
+            pass
+
+        # Bordures extérieures
+        def apply_outer_border(min_row, max_row, min_col, max_col):
+            for r in range(min_row, max_row + 1):
+                for c in range(min_col, max_col + 1):
+                    cell = ws.cell(row=r, column=c)
+                    border = Border()
+                    if r == min_row:
+                        border.top = Side(style='thin')
+                    if r == max_row:
+                        border.bottom = Side(style='thin')
+                    if c == min_col:
+                        border.left = Side(style='thin')
+                    if c == max_col:
+                        border.right = Side(style='thin')
+                    try:
+                        cell.border = border
+                    except Exception:
+                        pass
+
+        apply_outer_border(10, 14, 2, 7)  # B10:G14
+        apply_outer_border(16, 20, 2, 7)  # B16:G20
+
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
@@ -385,21 +427,3 @@ def export_excel():
     return send_file(output, download_name=filename, as_attachment=True,
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-                except:
-                    pass
-
-    output = io.BytesIO()
-    wb.save(output)
-    output.seek(0)
-
-    filename = f"rapports_ge_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
-    return send_file(output, download_name=filename, as_attachment=True,
-                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-
-@app.route('/uploads/<filename>')
-@login_required
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
