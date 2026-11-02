@@ -417,12 +417,6 @@ def export_excel():
         except:
             pass
 
-        # Zone d'impression page 1 (lignes 1 à 44)
-        ws.print_area = 'A1:G44'
-        ws.page_setup.fitToPage = True
-        ws.page_setup.fitToWidth = 1
-        ws.page_setup.fitToHeight = 1
-
         # === ENCADREMENTS (bordures extérieures uniquement) ===
         thin = Border(
             left=Side(style='thin'),
