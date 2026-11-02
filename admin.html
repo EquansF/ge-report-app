@@ -52,7 +52,7 @@
                 {% for r in reports %}
                 <tr>
                     <td><input type="checkbox" class="report-check" name="ids" value="{{ r.id }}" form="exportForm"></td>
-                    <td>{{ r.submitted_at[:19] }}</td>
+                    <td>{{ r.submitted_at_fr }}</td>
                     <td>{{ r.batiment or '-' }}</td>
                     <td>{{ r.redacteur or '-' }}</td>
                     <td>{{ r.date_essai or '-' }}</td>

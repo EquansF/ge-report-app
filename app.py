@@ -136,7 +136,17 @@ def admin():
     c.execute('SELECT id, submitted_at, batiment, redacteur, date_essai FROM reports ORDER BY submitted_at DESC')
     reports = c.fetchall()
     conn.close()
-    return render_template('admin.html', reports=reports)
+    # Formater les dates pour l'affichage
+    formatted = []
+    for r in reports:
+        d = dict(r)
+        try:
+            dt = datetime.fromisoformat(r['submitted_at'].replace('Z', '+00:00'))
+            d['submitted_at_fr'] = dt.strftime('%d/%m/%Y %H:%M')
+        except:
+            d['submitted_at_fr'] = r['submitted_at'][:16]
+        formatted.append(d)
+    return render_template('admin.html', reports=formatted)
 
 @app.route('/admin/view/<int:report_id>')
 @login_required
@@ -242,6 +252,8 @@ def export_excel():
         # Remplissage
         ws['B10'] = f"COMPTE RENDU DES ESSAIS GE \nBâtiment : {data.get('batiment', '')}\nLe : {date_fr}"
         ws['F6'] = f"Rédacteur : {data.get('redacteur', '')}"
+        # Même rédacteur en B34
+        ws['B34'] = data.get('redacteur', '')
         ws['B19'] = f"La consommation totale lors de ces essais a été de {data.get('consoTotale', 0)} litres."
         ws['B23'] = data.get('problemes', '')
 
