@@ -442,11 +442,15 @@
     <div class="grid-2">
         <div>
             <label>Photo 1</label>
-            <input type="file" id="photo1" name="photo1" accept="image/*" capture="environment">
+            <input type="file" id="photo1" name="photo1" accept="image/*" capture="environment" onchange="previewPhoto(this, 'preview1', 'remove1')">
+            <img id="preview1" style="max-width:200px; margin-top:8px; display:none; border-radius:6px;">
+            <button type="button" id="remove1" onclick="removePhoto('photo1', 'preview1', 'remove1')" style="display:none; margin-top:6px; background:#c0392b; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">Supprimer</button>
         </div>
         <div>
             <label>Photo 2</label>
-            <input type="file" id="photo2" name="photo2" accept="image/*" capture="environment">
+            <input type="file" id="photo2" name="photo2" accept="image/*" capture="environment" onchange="previewPhoto(this, 'preview2', 'remove2')">
+            <img id="preview2" style="max-width:200px; margin-top:8px; display:none; border-radius:6px;">
+            <button type="button" id="remove2" onclick="removePhoto('photo2', 'preview2', 'remove2')" style="display:none; margin-top:6px; background:#c0392b; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;">Supprimer</button>
         </div>
     </div>
 
@@ -525,8 +529,11 @@ async function saveData() {
         if (result.success) {
             status.className = 'success';
             status.textContent = '✅ Rapport enregistré avec succès ! (ID: ' + result.id + ')';
-            // Optionally reset form
-            // document.querySelectorAll('input, textarea, select').forEach(el => { if (el.type !== 'checkbox') el.value = ''; else if (el.id !== 'sel_gea') el.checked = false; });
+            status.style.display = 'block';
+            // Réinitialiser le formulaire
+            document.querySelector('form').reset();
+            // Masquer après 10 secondes
+            setTimeout(() => { status.style.display = 'none'; }, 10000);
         } else {
             status.className = 'error';
             status.textContent = '❌ Erreur : ' + (result.error || 'Échec de l\'envoi');
@@ -535,6 +542,30 @@ async function saveData() {
         status.className = 'error';
         status.textContent = '❌ Erreur réseau : ' + err.message;
     }
+}
+
+function previewPhoto(input, previewId, removeBtnId) {
+    const preview = document.getElementById(previewId);
+    const removeBtn = document.getElementById(removeBtnId);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            removeBtn.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removePhoto(inputId, previewId, removeBtnId) {
+    const input = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    const removeBtn = document.getElementById(removeBtnId);
+    input.value = '';
+    preview.src = '';
+    preview.style.display = 'none';
+    removeBtn.style.display = 'none';
 }
 
 document.addEventListener('input', e => {
@@ -546,6 +577,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().slice(0, 10);
     const dateEl = document.getElementById('dateEssai');
     if (dateEl) dateEl.value = today;
+    // Réinitialiser tous les champs au chargement
+    document.querySelectorAll('input:not([type=checkbox]):not([type=submit]):not([type=button]), textarea').forEach(el => {
+        if (el.id !== 'dateEssai') el.value = '';
+    });
     updateConsommations();
     toggleGE();
 });
