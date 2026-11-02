@@ -3,3 +3,4 @@ flask-login
 openpyxl
 werkzeug
 gunicorn
+Pillow
