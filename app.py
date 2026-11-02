@@ -394,15 +394,11 @@ def export_excel():
             # Zone signatures
             'B33:C33', 'D33:E33', 'F33:G33',
             'B34:C34', 'D34:E34', 'F34:G34',
-            'B35:C35', 'D35:E35', 'F35:G35',
-            'B36:C36', 'D36:E36', 'F36:G36',
-            'B37:C37', 'D37:E37', 'F37:G37',
-            'B38:C38', 'D38:E38', 'F38:G38',
+            # Fusions verticales 35-38
+            'B35:C38', 'D35:E38', 'F35:G38',
             'B39:C39', 'D39:E39', 'F39:G39',
-            'B40:C40', 'D40:E40', 'F40:G40',
-            'B41:C41', 'D41:E41', 'F41:G41',
-            'B42:C42', 'D42:E42', 'F42:G42',
-            'B43:C43', 'D43:E43', 'F43:G43'
+            # Fusions verticales 40-43
+            'B40:C43', 'D40:E43', 'F40:G43'
         ]
         for m in merges:
             try:
