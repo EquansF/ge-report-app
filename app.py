@@ -209,7 +209,18 @@ def export_excel():
             ws.unmerge_cells(str(merged))
 
         # === EN-TÊTE ===
-        ws['B10'] = f"COMPTE RENDU DES ESSAIS GE \nBâtiment : {data.get('batiment', '')}\nLe : {data.get('dateEssai', '')}"
+        date_str = data.get('dateEssai', '')
+        try:
+            from datetime import datetime
+            if date_str:
+                d = datetime.strptime(date_str, '%Y-%m-%d')
+                mois = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre']
+                date_fr = f"{d.day} {mois[d.month-1]} {d.year}"
+            else:
+                date_fr = ''
+        except:
+            date_fr = date_str
+        ws['B10'] = f"COMPTE RENDU DES ESSAIS GE \nBâtiment : {data.get('batiment', '')}\nLe : {date_fr}"
         ws['F6'] = f"Rédacteur : {data.get('redacteur', '')}"
 
         # === RÉSUMÉ ===
@@ -364,51 +375,10 @@ def export_excel():
         # Commentaires
         ws['B213'] = data.get('commentaires', '')
 
-        # === FUSIONS DEMANDÉES ===
-        # B87:B95 avec C
-        for row in range(87, 96):
-            ws.merge_cells(f'B{row}:C{row}')
-
-        # B110:B118 avec C
-        for row in range(110, 119):
-            ws.merge_cells(f'B{row}:C{row}')
-
-        # B134:B142 avec C
-        for row in range(134, 143):
-            ws.merge_cells(f'B{row}:C{row}')
-
-        # B157:B165 avec C
-        for row in range(157, 166):
-            ws.merge_cells(f'B{row}:C{row}')
-
-        # B202 avec C
-        ws.merge_cells('B202:C202')
-
-        # B210 jusqu'à E210
-        ws.merge_cells('B210:E210')
-
-        # === FUSIONS SUPPLÉMENTAIRES ===
-        ws.merge_cells('B18:G18')
-        ws.merge_cells('B22:G22')
-
-        # Nouvelles fusions demandées
-        for row in range(5, 8):
-            ws.merge_cells(f'F{row}:G{row}')
-        ws.merge_cells('B10:G14')
-        ws.merge_cells('B19:G19')
-        ws.merge_cells('B22:G24')
-
-        # Alignements spécifiques
-        top_center = Alignment(horizontal="center", vertical="top", wrap_text=True)
-        ws['B18'].alignment = top_center
-        ws['B19'].alignment = top_center
-
         # === SUPPRESSION DE LIGNES ===
         for row_num in sorted([216, 208, 200, 191], reverse=True):
             ws.delete_rows(row_num)
-        # Supprimer les lignes 24 à 30 (après les autres suppressions, ajuster si besoin)
-        ws.delete_rows(24, 7)  # Supprime 7 lignes à partir de la ligne 24
-        # Supprimer les lignes 29 et 30
+        ws.delete_rows(24, 7)
         ws.delete_rows(29, 2)
 
         # === CENTRAGE DE TOUT LE TEXTE ===
@@ -416,7 +386,38 @@ def export_excel():
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=7):
             for cell in row:
                 if cell.value is not None:
-                    cell.alignment = center_align
+                    try:
+                        cell.alignment = center_align
+                    except:
+                        pass
+
+        # Alignements spécifiques demandés
+        bottom_align = Alignment(horizontal="center", vertical="bottom", wrap_text=True)
+        top_left = Alignment(horizontal="left", vertical="top", wrap_text=True)
+        try:
+            ws['F5'].alignment = bottom_align
+            ws['F6'].alignment = bottom_align
+            ws['F7'].alignment = bottom_align
+        except:
+            pass
+        try:
+            ws['B18'].alignment = top_left
+        except:
+            pass
+
+        # Fusions demandées
+        try:
+            ws.merge_cells('B16:G16')
+            ws.merge_cells('B22:G31')
+            ws['B22'].alignment = top_left
+        except:
+            pass
+
+        # Zone d'impression page 1 (lignes 1 à 44)
+        ws.print_area = 'A1:G44'
+        ws.page_setup.fitToPage = True
+        ws.page_setup.fitToWidth = 1
+        ws.page_setup.fitToHeight = 1
 
         # === ENCADREMENTS (bordures extérieures uniquement) ===
         thin = Border(
@@ -427,7 +428,7 @@ def export_excel():
         )
         # Bordure extérieure B10:G14
         for row in range(10, 15):
-            for col in range(2, 8):  # B à G
+            for col in range(2, 8):
                 cell = ws.cell(row=row, column=col)
                 border = Border()
                 if row == 10:
@@ -438,7 +439,10 @@ def export_excel():
                     border.left = Side(style='thin')
                 if col == 7:
                     border.right = Side(style='thin')
-                cell.border = border
+                try:
+                    cell.border = border
+                except:
+                    pass
 
         # Bordure extérieure B16:G20
         for row in range(16, 21):
@@ -453,7 +457,10 @@ def export_excel():
                     border.left = Side(style='thin')
                 if col == 7:
                     border.right = Side(style='thin')
-                cell.border = border
+                try:
+                    cell.border = border
+                except:
+                    pass
 
     output = io.BytesIO()
     wb.save(output)
