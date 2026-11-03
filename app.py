@@ -65,6 +65,69 @@ def get_db():
 def index():
     return render_template('form.html')
 
+@app.route('/api/submit', methods=['POST'])
+def api_submit():
+    """API pour l'application mobile"""
+    try:
+        # Accepte JSON direct ou form-data
+        if request.is_json:
+            data_dict = request.get_json()
+        else:
+            data = request.form.get('data')
+            if not data:
+                return jsonify({'success': False, 'error': 'Aucune donnée'}), 400
+            data_dict = json.loads(data)
+
+        # Photos
+        photo1_filename = None
+        photo2_filename = None
+        if 'photo1' in request.files:
+            photo1 = request.files['photo1']
+            if photo1 and photo1.filename:
+                photo1_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_photo1_{photo1.filename}"
+                photo1.save(os.path.join(app.config['UPLOAD_FOLDER'], photo1_filename))
+        if 'photo2' in request.files:
+            photo2 = request.files['photo2']
+            if photo2 and photo2.filename:
+                photo2_filename = f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_photo2_{photo2.filename}"
+                photo2.save(os.path.join(app.config['UPLOAD_FOLDER'], photo2_filename))
+
+        conn = get_db()
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO reports (submitted_at, batiment, redacteur, date_essai, data_json, photo1, photo2)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            datetime.now().isoformat(),
+            data_dict.get('batiment', ''),
+            data_dict.get('redacteur', ''),
+            data_dict.get('dateEssai', ''),
+            json.dumps(data_dict),
+            photo1_filename,
+            photo2_filename
+        ))
+        conn.commit()
+        report_id = c.lastrowid
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'id': report_id,
+            'message': 'Rapport enregistré avec succès'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/reports', methods=['GET'])
+def api_reports():
+    """Liste des rapports (pour l'appli si besoin plus tard)"""
+    conn = get_db()
+    c = conn.cursor()
+    c.execute('SELECT id, submitted_at, batiment, redacteur, date_essai FROM reports ORDER BY submitted_at DESC LIMIT 50')
+    reports = [dict(r) for r in c.fetchall()]
+    conn.close()
+    return jsonify({'success': True, 'reports': reports})
+
 @app.route('/submit', methods=['POST'])
 def submit():
     try:
